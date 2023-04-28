@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kayıtlı Kişiler</title>
+    <link rel="stylesheet" href="indexstyle.css">
+</head>
+<body>
+
+
+    <!--KAYITLI KİŞİLER LİSTESİ-->
+    <section id="kisiDataSection">
+        <div class="logoPNG">
+            <img src="" alt=""> <!--you can add pic here-->
+        </div>
+        <div class="list">
+            <h2>Kişi Ara</h2>
+            <input type="text" id="search" placeholder="Ara">
+            <h2 class="kisilistesibaslik">Kişi Listesi</h2>
+            <ul id="dataList"></ul>
+        </div>
+    </section>
+
+    
+    <script type="text/javascript">
+
+        document.querySelector('#search').addEventListener('input', search);
+
+        //arama fonksiyonu
+        function search() {
+          var input = document.querySelector('#search').value.toLowerCase();
+          var dataList = document.querySelector('#dataList');
+        
+          for (var i = 0; i < dataList.children.length; i++) {
+            var name = dataList.children[i].querySelector('span:first-child').textContent.toLowerCase();
+            var email = dataList.children[i].querySelector('span:nth-child(2)').textContent.toLowerCase();
+            var telephone = dataList.children[i].querySelector('span:nth-child(3)').textContent.toLowerCase();
+            var unvan = dataList.children[i].querySelector('span:nth-child(4)').textContent.toLowerCase();
+        
+            if (name.indexOf(input) > -1 || email.indexOf(input) > -1 ||  telephone.indexOf(input) > -1 ||  unvan.indexOf(input) > -1) {
+              dataList.children[i].style.display = 'block';
+            } else {
+              dataList.children[i].style.display = 'none';
+            }
+          }
+        }
+        
+          
+        //kaydedilen datalar fonksiyonu
+        function showDataList() {
+            var dataList = document.querySelector('#dataList');
+            dataList.innerHTML = '';
+
+            for (var i = 0; i < localStorage.length; i++) {
+                var key = localStorage.key(i);
+                var data = JSON.parse(localStorage.getItem(key));
+
+                var li = document.createElement('li');
+                var name = document.createElement('span');
+                var email = document.createElement('span');
+                var telephone = document.createElement('span');
+                var unvan = document.createElement('span');
+                var editLink = document.createElement('a');
+                var deleteLink = document.createElement('a');
+
+                name.textContent = data.name;
+                email.textContent = data.email;
+                telephone.textContent = data.telephone;
+                unvan.textContent = data.unvan;
+
+                li.appendChild(name);
+                li.appendChild(email);
+                li.appendChild(telephone);
+                li.appendChild(unvan);
+                li.appendChild(editLink);
+                li.appendChild(deleteLink);
+                dataList.appendChild(li);
+            }
+        }
+    
+    
+        showDataList();
+    </script>
+</body>
+</html>
+
+
+
+<!--https://www.linkedin.com/in/aligunesv1/-->
+<!--https://github.com/aligunesv-->

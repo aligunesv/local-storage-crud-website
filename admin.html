@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>admin</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!--LOGIN SCREEN-->
+    <div id="loginScreen" class="loginScreen">
+        <form id="login_screen" name="myLoginForm">
+            <h1>GİRİŞ EKRANI</h1>
+            <p>Kullanıcı Adı</p>
+            <input type="text" name="kullaniciadi" id="kullaniciadi">
+            <p>Şifre</p>
+            <input type="password" name="sifre" id="sifre">
+            <button id="girisBtn">Giriş Yap</button>
+            <div class="blurPage"></div>
+        </form>
+    </div>
+
+    <!--ADD DATA-->
+    <section id="kisiEkleSection">
+        <div class="addNew">
+            <form>
+                <h2>Yeni Kişi Kaydet</h2>
+                <input type="text" id="name" placeholder="İsim Soyisim">
+                <input type="email" id="email" placeholder="Email">
+                <input type="text" id="telephone" placeholder="Telefon Numarası">
+                <input type="text" id="unvan" placeholder="Unvan">
+                <button id="saveBtn">Kaydet</button>
+            </form>
+            <div class="menu">
+                <li><a href="#kisiDataSection">Kişi Listesi</a></li>
+            </div>
+        </div>
+    </section>
+
+    <!--SEARCH DATA-->
+    <section id="kisiDataSection">
+        <div class="list">
+            <h2>Kişi Ara</h2>
+            <input type="text" id="search" placeholder="Ara">
+            <h2 class="kisilistesibaslik">Kişi Listesi</h2>
+            <ul id="dataList"></ul>
+        </div>
+    </section>
+
+    <!--UPDATE DATA-->
+    <section id="kisiGuncelleSection">
+        <div class="update">
+            <h2>Kişi Güncelle</h2>
+            <form>
+                <select id="dataToUpdate"></select>
+                <input type="text" id="newName" placeholder="Yeni İsim Soyisim">
+                <input type="email" id="newEmail" placeholder="Yeni Email">
+                <input type="text" id="newTelephone" placeholder="Yeni Telefon Numarası">
+                <input type="text" id="newUnvan" placeholder="Yeni Unvan">
+                <button id="updateBtn">Güncelle</button>
+            </form>
+        </div>
+    </section>
+
+    <!--DELETE DATA-->
+    <section id="kisiSilSection">
+        <div class="delete">
+            <h2>Kişi Sil</h2>
+            <form>
+                <select id="dataToDelete"></select>
+                <button id="deleteBtn">Sil</button>
+            </form>
+        </div>
+    </section>
+
+
+    
+    <script type="text/javascript">
+
+        // ADD SYSTEM
+        document.querySelector('#saveBtn').onclick = function(e) {
+            e.preventDefault();
+            var name = document.querySelector('#name').value;
+            var email = document.querySelector('#email').value;
+            var telephone = document.querySelector('#telephone').value;
+            var unvan = document.querySelector('#unvan').value;
+
+            var data = {
+                name: name,
+                email: email,
+                telephone: telephone,
+                unvan: unvan
+            };
+            localStorage.setItem(Date.now(), JSON.stringify(data));
+
+            document.querySelector('#name').value = '';
+            document.querySelector('#email').value = '';
+            document.querySelector('#telephone').value = '';
+            document.querySelector('#unvan').value = '';
+
+            var successMsg = document.createElement('p');
+            successMsg.textContent = 'Kaydetme Başarılı';
+            document.querySelector('.addNew').appendChild(successMsg);
+            setTimeout(function() {
+                successMsg.remove();
+            }, 3000);
+
+            showDataList();
+        }
+
+        document.querySelector('#search').addEventListener('input', search);
+
+        //SEARCH SYSTEM
+        function search() {
+          var input = document.querySelector('#search').value.toLowerCase();
+          var dataList = document.querySelector('#dataList');
+        
+          for (var i = 0; i < dataList.children.length; i++) {
+            var name = dataList.children[i].querySelector('span:first-child').textContent.toLowerCase();
+            var email = dataList.children[i].querySelector('span:nth-child(2)').textContent.toLowerCase();
+            var telephone = dataList.children[i].querySelector('span:nth-child(3)').textContent.toLowerCase();
+            var unvan = dataList.children[i].querySelector('span:nth-child(4)').textContent.toLowerCase();
+            var editLink = dataList.children[i].querySelector('a:first-child');
+            var deleteLink = dataList.children[i].querySelector('a:last-child');
+        
+            if (name.indexOf(input) > -1 || email.indexOf(input) > -1 ||  telephone.indexOf(input) > -1 ||  unvan.indexOf(input) > -1) {
+              dataList.children[i].style.display = 'block';
+            } else {
+              dataList.children[i].style.display = 'none';
+            }
+          }
+        }
+        
+          
+        //DATAS
+        function showDataList() {
+            var dataList = document.querySelector('#dataList');
+            dataList.innerHTML = '';
+
+            for (var i = 0; i < localStorage.length; i++) {
+                var key = localStorage.key(i);
+                var data = JSON.parse(localStorage.getItem(key));
+
+                var li = document.createElement('li');
+                var name = document.createElement('span');
+                var email = document.createElement('span');
+                var telephone = document.createElement('span');
+                var unvan = document.createElement('span');
+                var editLink = document.createElement('a');
+                var deleteLink = document.createElement('a');
+
+                name.textContent = data.name;
+                email.textContent = data.email;
+                telephone.textContent = data.telephone;
+                unvan.textContent = data.unvan;
+                editLink.href = '#kisiGuncelleSection';
+                editLink.textContent = 'Düzenle';
+                deleteLink.href = '#kisiSilSection';
+                deleteLink.textContent = 'Sil';
+
+                editLink.addEventListener('click', function() {
+                    showUpdateForm(key);
+                });
+                deleteLink.addEventListener('click', function() {
+                    showDeleteForm(key);
+                });
+    
+                li.appendChild(name);
+                li.appendChild(email);
+                li.appendChild(telephone);
+                li.appendChild(unvan);
+                li.appendChild(editLink);
+                li.appendChild(deleteLink);
+                dataList.appendChild(li);
+            }
+        }
+    
+        // UPDATE DATA SYSTEM
+        function showUpdateForm(key) {
+            var data = JSON.parse(localStorage.getItem(key));
+            var updateForm = document.querySelector('.update form');
+            updateForm.style.display = 'block';
+    
+            var dataToUpdate = document.querySelector('#dataToUpdate');
+            dataToUpdate.innerHTML = '';
+            var option = document.createElement('option');
+            option.value = key;
+            option.textContent = data.name;
+            option.selected = true;
+            dataToUpdate.appendChild(option);
+    
+            document.querySelector('#newName').value = data.name;
+            document.querySelector('#newEmail').value = data.email;
+            document.querySelector('#newTelephone').value = data.telephone;
+            document.querySelector('#newUnvan').value = data.unvan;
+
+        }
+    
+        document.querySelector('#updateBtn').onclick = function(e) {
+            e.preventDefault();
+            var key = document.querySelector('#dataToUpdate').value;
+            var newName = document.querySelector('#newName').value;
+            var newEmail = document.querySelector('#newEmail').value;
+            var newTelephone = document.querySelector('#newTelephone').value;
+            var newUnvan = document.querySelector('#newUnvan').value;
+
+            var data = {
+                name: newName,
+                email: newEmail,
+                telephone: newTelephone,
+                unvan: newUnvan
+            };
+            localStorage.setItem(key, JSON.stringify(data));
+    
+            document.querySelector('#newName').value = '';
+            document.querySelector('#newEmail').value = '';
+            document.querySelector('#newTelephone').value = '';
+            document.querySelector('#newUnvan').value = '';
+
+            document.querySelector('.update form').style.display = 'none';
+    
+            var successMsg = document.createElement('p');
+            successMsg.textContent = 'Güncelleme Başarılı';
+            document.querySelector('.update').appendChild(successMsg);
+            setTimeout(function() {
+                successMsg.remove();
+            }, 3000);
+    
+            showDataList();
+        }
+    
+        // DELETE DATA SYSTEM
+        function showDeleteForm(key) {
+            var data = JSON.parse(localStorage.getItem(key));
+            var deleteForm = document.querySelector('.delete form');
+            deleteForm.style.display = 'block';
+    
+            var dataToDelete = document.querySelector('#dataToDelete');
+            dataToDelete.innerHTML = '';
+            var option = document.createElement('option');
+            option.value = key;
+            option.textContent = data.name;
+            option.selected = true;
+            dataToDelete.appendChild(option);
+        }
+    
+        document.querySelector('#deleteBtn').onclick = function(e) {
+            e.preventDefault();
+            var key = document.querySelector('#dataToDelete').value;
+    
+            localStorage.removeItem(key);
+    
+            document.querySelector('.delete form').style.display = 'none';
+    
+            var successMsg = document.createElement('p');
+            successMsg.textContent = 'Silme Başarılı';
+            document.querySelector('.delete').appendChild(successMsg);
+            setTimeout(function() {
+                successMsg.remove();
+            }, 3000);
+    
+            showDataList();
+        }
+
+
+        //LOGIN SYSTEM
+        attempt=5;
+        document.querySelector('#girisBtn').onclick = function(e) {
+            e.preventDefault();
+            var kullaniciadi = document.getElementById("kullaniciadi").value;
+            var sifre = document.getElementById("sifre").value;
+
+            if ( kullaniciadi == "aligunes" && sifre == "aligunes"){
+                alert ("Login successfully");
+                document.getElementById("loginScreen").style.display='none';
+                return false;
+            }
+            else{
+
+                if(kullaniciadi != "btdestek"){
+                    alert("Kullanıcı adı hatalı!")
+                }
+
+                if(sifre != "aligunes"){
+                    alert("Şifre hatalı!")
+                }
+
+                attempt --;
+                alert("You have left "+attempt+" attempt;");
+
+                if( attempt == 0){
+                document.getElementById("kullaniciadi").disabled = true;
+                document.getElementById("sifre").disabled = true;
+                document.getElementById("login").disabled = true;
+                return false;
+                    }
+                }
+            }
+    
+        showDataList();
+    </script>
+</body>
+</html>
+
+<!--https://www.linkedin.com/in/aligunesv1/-->
+<!--https://github.com/aligunesv-->
