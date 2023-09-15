@@ -1,4 +1,4 @@
-# local-storage-crud-website
+# Local Storage Crud Website - HTML - CSS - JS
 
 # EN
 # What is this application? What does it do? What can be done?
